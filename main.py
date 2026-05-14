@@ -23,6 +23,7 @@ class GameState:
 		self.game_over = False
 
 
+
 class Player(Turtle):
 	def __init__(self, x, y, color, screen, right_key, left_key, fire_key, bomb_key):
 		super().__init__()
@@ -129,7 +130,9 @@ class Prize(Turtle):
 		self.relocate()
 
 	def relocate(self):
-		pass
+		self.goto(randint(-230, 230), randint(-230, 230))
+
+
 
 
 class Bomb(Turtle):
