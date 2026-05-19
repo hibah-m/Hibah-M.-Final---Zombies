@@ -170,9 +170,7 @@ class Bomb(Turtle):
 		explosion.color("red")
 		explosion.goto(self.xcor(), self.ycor())
 		explosion.pendown()
-		pen.begin_fill()
 		explosion.circle(100)
-		pen.end_fill()
 
 		ontimer(explosion.hideturtle, 200)
 
