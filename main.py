@@ -129,15 +129,13 @@ class Bullet(Turtle):
 		if self.xcor() > 250 or self.xcor() < -250 or self.ycor() > 250 or self.ycor() < -250:
 
 			self.die()
-			return True
 
-		return False
 
 	def die(self):
 
 		self.clear()
 		self.hideturtle()
-		self.goto(1000, 1000)
+		self.player.bullets.remove(self)
 
 
 class Zombie(Turtle):
@@ -150,6 +148,9 @@ class Zombie(Turtle):
 
 		self.target = target
 
+
+		self.move_speed = randint(2, 3)
+
 		valid_position = False
 
 		while valid_position == False:
@@ -157,7 +158,10 @@ class Zombie(Turtle):
 			x = randint(-240, 240)
 			y = randint(-240, 240)
 
-			if target.distance(x, y) > 80:
+			far_from_p1 = p1.distance(x, y) > 80
+			far_from_p2 = p2.distance(x, y) > 80
+
+			if far_from_p1 and far_from_p2:
 
 				valid_position = True
 
@@ -168,7 +172,8 @@ class Zombie(Turtle):
 		if self.target.alive:
 
 			self.setheading(self.towards(self.target))
-			self.forward(2)
+
+			self.forward(self.move_speed)
 
 	def die(self):
 
@@ -197,8 +202,10 @@ class Prize(Turtle):
 class Bomb(Turtle):
 	def __init__(self, player):
 		super().__init__()
+		self.ht
 
 		self.player = player
+		self.speed(0)
 
 		self.shape("circle")
 		self.color("orange")
@@ -206,6 +213,7 @@ class Bomb(Turtle):
 		self.penup()
 
 		self.goto(player.xcor(), player.ycor())
+		self.st
 
 		self.getscreen().ontimer(self.explode, 1000)
 
@@ -219,7 +227,7 @@ class Bomb(Turtle):
 		explosion.penup()
 		explosion.color("red")
 
-		explosion.goto(self.xcor(), self.ycor())
+		explosion.goto(self.xcor(), self.ycor() - 100)
 
 		explosion.begin_fill()
 
@@ -232,7 +240,7 @@ class Bomb(Turtle):
 
 		for z in zombies:
 
-			if self.distance(z) < 100:
+			if self.distance(z) <= 100:
 
 				z.die()
 				to_remove.append(z)
@@ -286,38 +294,6 @@ class Score(Turtle):
 		self.score += 1
 		self.update_score()
 
-
-#### DRIVER CODE #####
-
-screen = Screen()
-
-screen.bgcolor("black")
-
-playing_area()
-
-screen.listen()
-
-state = GameState()
-
-p1 = Player(-100, 0, "red", screen, "d", "a", "w", "s")
-p2 = Player(100, 0, "blue", screen, "Right", "Left", "Up", "Down")
-
-players = [p1, p2]
-
-zombies = []
-
-prize = Prize()
-
-score1 = Score(-200, 260, "Player 1")
-score2 = Score(100, 260, "Player 2")
-
-writer = Turtle()
-
-writer.hideturtle()
-writer.penup()
-writer.color("white")
-
-
 def unlock_prize():
 
 	state.prize_lock = False
@@ -353,51 +329,26 @@ def game_loop():
 
 		for bullet in player.bullets:
 
-			keep_bullet = True
+			bullet.move()
 
-			offscreen = bullet.move()
 
-			if offscreen:
+			for zombie in zombies:
 
-				bullet.die()
-				keep_bullet = False
+				if bullet.distance(zombie) < 20:
 
-			else:
+						bullet.die()
 
-				hit = False
+						zombie.die()
 
-				for zombie in zombies:
+						zombies.remove(zombie)
 
-					if bullet.distance(zombie) < 20:
+						if player == p1:
+							score1.add_point()
 
-						if hit == False:
+						else:
+							score2.add_point()
 
-							bullet.die()
-
-							zombie.die()
-
-							zombies_to_remove.append(zombie)
-
-							if player == p1:
-								score1.add_point()
-
-							else:
-								score2.add_point()
-
-							hit = True
-
-				if hit == True:
-					keep_bullet = False
-
-			if keep_bullet:
-				new_bullet_list.append(bullet)
-
-		player.bullets = new_bullet_list
-
-	for z in zombies_to_remove:
-
-		if z in zombies:
-			zombies.remove(z)
+						hit = True
 
 	for player in players:
 
@@ -435,6 +386,37 @@ def game_loop():
 				)
 
 	screen.ontimer(game_loop, 20)
+
+#### DRIVER CODE #####
+
+screen = Screen()
+
+screen.bgcolor("black")
+
+playing_area()
+
+screen.listen()
+
+state = GameState()
+
+p1 = Player(-100, 0, "red", screen, "d", "a", "w", "s")
+p2 = Player(100, 0, "blue", screen, "Right", "Left", "Up", "Down")
+
+players = [p1, p2]
+
+zombies = []
+
+prize = Prize()
+
+score1 = Score(-200, 260, "Player 1")
+score2 = Score(100, 260, "Player 2")
+
+writer = Turtle()
+
+writer.hideturtle()
+writer.penup()
+writer.color("white")
+
 
 
 game_loop()
