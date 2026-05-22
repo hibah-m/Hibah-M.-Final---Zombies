@@ -202,7 +202,7 @@ class Prize(Turtle):
 class Bomb(Turtle):
 	def __init__(self, player):
 		super().__init__()
-		self.ht
+		self.ht()
 
 		self.player = player
 		self.speed(0)
@@ -213,7 +213,7 @@ class Bomb(Turtle):
 		self.penup()
 
 		self.goto(player.xcor(), player.ycor())
-		self.st
+		self.st()
 
 		self.getscreen().ontimer(self.explode, 1000)
 
